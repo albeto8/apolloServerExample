@@ -1,132 +1,65 @@
 const { ApolloServer, gql } = require('apollo-server');
 
-let employees = [
+let documents = [
   {
     id: 1,
-    name: 'John Smith',
-    employerId: 1,
+    contentData: '# Hello world',
   },
   {
     id: 2,
-    name: 'Lauren Armstrong',
-    employerId: 1,
-  },
-  {
-    id: 3,
-    name: 'Henry Bautista',
-    employerId: 1,
-  },
-  {
-    id: 4,
-    name: 'Jake Snarl',
-    employerId: 2,
-  },
-];
-
-let employers = [
-  {
-    id: 1,
-    name: 'Harrys pub',
-  },
-  {
-    id: 2,
-    name: 'UPS',
+    contentData: '# Hello world 2',
   },
 ];
 
 const typeDefs = gql`
   type Query {
-    employers: [Employer]
-    employees: [Employee]
-    employer(id: Int): Employer
-    employee(id: Int): Employee
+    documents: [Document]
+    document(id: Int): Document
   }
-  type Employer {
+  type Document {
     id: Int
-    name: String
-    employees: [Employee]
-    numEmployees: Int
-  }
-  type Employee {
-    id: Int
-    name: String
-    employer: Employer
+    contentData: String
   }
   type Mutation {
-    addEmployee(name: String!, employerId: Int!): Employee
-    removeEmployee(id: Int!): [Employee]
-    changeEmployeeName(id: Int!, name: String!): Employee
-    changeEmployer(id: Int!, employerId: Int!): Employee
+    addDocument(contentData: String!): Document
+    removeDocument(id: Int!): [Document]
+    changeDocumentContent(id: Int!, contentData: String!): Document
   }
 `;
 
 const resolvers = {
   Query: {
-    employer: (_, args) => employers.filter(e => e.id === args.id)[0],
-    employee: (_, args) => employees.filter(e => e.id === args.id)[0],
-    employers: () => employers,
-    employees: () => employees,
-  },
-  Employer: {
-    numEmployees: (parentValue) => {
-      console.log('parentValue in Employer: ', parentValue);
-      return employees.filter(e => e.employerId === parentValue.id).length;
-    },
-    employees: (parentValue) => {
-      return employees.filter(e => e.employerId === parentValue.id);
-    },
-  },
-  Employee: {
-    employer: (parentValue) => {
-      return employers.filter(e => e.id === parentValue.employerId)[0];
-    },
+    document: (_, args) => documents.filter(e => e.id === args.id)[0],
+    documents: () => documents,
   },
   Mutation: {
-    addEmployee: (_, args) => {
-      const newEmployee = {
-        id: employees.length + 1,
-        name: args.name,
-        employerId: args.employerId,
+    addDocument: (_, args) => {
+      const newDocument = {
+        id: documents.length + 1,
+        contentData: args.contentData,
       };
-      employees.push(newEmployee);
-      return newEmployee;
+      documents.push(newDocument);
+      return newDocument;
     },
-    removeEmployee: (_, args) => {
-      return employees.filter(e => e.id !== args.id)
+    removeDocument: (_, args) => {
+      return documents.filter(e => e.id !== args.id)
     },
-    changeEmployeeName: (_, args) => {
-      let newEmployee;
-      // Change employees
-      employees = employees.map(e => {
+    changeDocumentContent: (_, args) => {
+      let newDocument;
+      // Change documents
+      documents = documents.map(e => {
         if(e.id === args.id) {
-          newEmployee = {
+          newDocument = {
             ...e,
-            name: args.name,
+            contentData: args.contentData,
           };
-          return newEmployee
+          return newDocument
         };
         return e;
       });
-      // Return change employee
-      return newEmployee;
+      // Return change document
+      return newDocument;
     },
-    changeEmployer: (_, args) => {
-      let newEmployee;
-      // Change employees
-      employees = employees.map(e => {
-        if(e.id === args.id) {
-          newEmployee = {
-            ...e,
-            employerId: args.employerId,
-          };
-          return newEmployee
-        };
-        return e;
-      });
-      // Return change employee
-      return newEmployee;
-    },
-
   }
 }
 
