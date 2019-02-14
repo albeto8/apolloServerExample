@@ -5,10 +5,6 @@ let documents = [
     id: 1,
     contentData: '# Hello world',
   },
-  {
-    id: 2,
-    contentData: '# Hello world 2',
-  },
 ];
 
 const typeDefs = gql`
@@ -42,7 +38,8 @@ const resolvers = {
       return newDocument;
     },
     removeDocument: (_, args) => {
-      return documents.filter(e => e.id !== args.id)
+      documents = documents.filter(e => e.id !== args.id)
+      return documents
     },
     changeDocumentContent: (_, args) => {
       let newDocument;
